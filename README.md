@@ -1,1 +1,1 @@
-# cryptit
+# CryptIt
