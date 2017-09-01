@@ -1,0 +1,9 @@
+# TODO list
+
+## Add new features
+- [ ] add threading encryption;
+- [ ] add zip support;
+- [ ] add rsa + aes;
+- [ ] add logging;
+
+## Fix bug
