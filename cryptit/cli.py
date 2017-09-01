@@ -73,7 +73,7 @@ def dirmirror(src, dist):  # TODO handle os access excetions
             os.makedirs(newdir)
 
 
-def encrypt_file(filepath, new_dir, encryptor, chunksize=64 * 1024):
+def encrypt_file(filepath, new_dir, encryptor, iv, chunksize=64 * 1024):
     filesize = os.path.getsize(filepath)
     with open(filepath, 'rb') as infile:
         with open(os.path.join(new_dir, filepath + '.aes'), 'wb') as outfile:
@@ -124,11 +124,11 @@ def main():
             dirmirror(arg.path, new_dir)
             for filepath in tqdm(walkdir(arg.path)):
                 if not new_dir in filepath:
-                    encrypt_file(filepath, new_dir, encryptor)
+                    encrypt_file(filepath, new_dir, encryptor, iv)
                     # logger.info('encrypting file {}'.format(filepath))
         else:
             os.mkdir(new_dir)  # TODO handle access excetion
-            encrypt_file(arg.path, new_dir, encryptor)
+            encrypt_file(arg.path, new_dir, encryptor, iv)
 
 
 if __name__ == '__main__':
