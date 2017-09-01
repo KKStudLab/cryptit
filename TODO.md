@@ -5,5 +5,6 @@
 - [ ] add zip support;
 - [ ] add rsa + aes;
 - [ ] add logging;
+- [ ] write readme.md
 
 ## Fix bug
