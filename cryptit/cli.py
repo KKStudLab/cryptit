@@ -156,7 +156,13 @@ def main():
                 print('[*] Encrypting was successful!!')
                 print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
             zf.close()
-            ans = raw_input('[*] Print archive info(y/n): ') # TODO only py2.7
+
+            try: 
+                input = raw_input
+            except NameError:
+                pass
+
+            ans = input('[*] Print archive info(y/n): ') # TODO only py2.7
             if ans in ('y', 'Y'):
                 print('\n\nArchive info:\n({})\n'.format(new_dir+'.zip'))
                 print_info(new_dir+'.zip')
