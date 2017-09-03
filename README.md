@@ -16,7 +16,7 @@ This is the preferred method to install CryptIt, as it will always install the m
 In case you downloaded or cloned the source code from [GitHub](https://github.com/maxkrivich/cryptit) or your own fork, you can run the following to install cameo for development:
 
 ```sh
-$ git clone https://github.com/maxkrivich/cryptit.git
+$ git clone https://github.com/KKStudLab/cryptit.git
 $ cd cryptit
 $ vitualenv --python=python[version] venv
 $ source venv/bin/active
