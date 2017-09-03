@@ -6,5 +6,6 @@
 - [ ] add rsa + aes;
 - [ ] add logging;
 - [ ] write readme.md
+- [ ] file hash sum;
 
 ## Fix bug

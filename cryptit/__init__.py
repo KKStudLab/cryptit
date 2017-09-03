@@ -41,7 +41,7 @@ class TqdmLoggingHandler(logging.Handler):
 		except:
 			self.handleError(record)
 
-logging.basicConfig(format = u'[%(asctime)s] %(message)s', level = logging.DEBUG)
+logging.basicConfig(format = u'[%(asctime)s] %(message)s', level = logging.INFO)
 
 logger = logging.getLogger(__name__)
 logger.addHandler(TqdmLoggingHandler())

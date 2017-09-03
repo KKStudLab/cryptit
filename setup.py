@@ -34,7 +34,7 @@ from setuptools import setup, find_packages, Command
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-NAME = 'CryptIt'
+NAME = 'cryptit'
 DESCRIPTION = ''
 URL = 'https://github.com/maxkrivich/cryptit/'
 EMAIL = 'maxkrivich@gmail.com'
