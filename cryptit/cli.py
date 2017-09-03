@@ -66,10 +66,10 @@ def walkdir(folder):  # TODO handle os access excetions
             yield os.path.join(dirpath, filename)
 
 
-def encrypt_file(filepath, encryptor, iv, chunksize=64 * 1024):
+def encrypt_file(filepath, sfilepath, encryptor, iv, chunksize=64 * 1024):
     filesize = os.path.getsize(filepath)
     with open(filepath, 'rb') as infile:
-        with open(filepath + '.aes', 'wb') as outfile:
+        with open(str.replace(filepath, sfilepath, '') + '.aes', 'wb') as outfile:
             outfile.write(struct.pack('<Q', filesize))
             outfile.write(iv)
 
@@ -87,6 +87,7 @@ def decrypt_file():
     # TODO implement this function
     pass
 
+
 def print_info(archive_name):
     zf = zipfile.ZipFile(archive_name)
     for info in zf.infolist():
@@ -95,8 +96,8 @@ def print_info(archive_name):
         print('[!] Modified:\t\t{}'.format(datetime(*info.date_time)))
         print('[!] System:\t\t{} (0 = Windows, 3 = Unix)'.format(info.create_system))
         print('[!] ZIP version:\t{}'.format(info.create_version))
-        print('[!] Compressed:\t\t{}'.format(info.compress_size, 'bytes'))
-        print('[!] Uncompressed:\t{}'.format(info.file_size, 'bytes'))
+        print('[!] Compressed:\t\t{} bytes'.format(info.compress_size))
+        print('[!] Uncompressed:\t{} bytes'.format(info.file_size))
 
 
 def main():
@@ -111,12 +112,12 @@ def main():
             raise ValueError(
                 'The path {} does not file and directory!'.format(arg.path))
 
-        d = datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S")
-        
+        d = datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")
+
         print('[*] Start time: {}'.format(d))
         print('[*] CryptIt mode: {}(AES-256 CBC mode)'.format('Decryption' if arg.decrypt else 'Encryption'))
         print('[*] Path: {}'.format(arg.path))
-        
+
         passwd = ''
 
         while not len(passwd):
@@ -133,16 +134,17 @@ def main():
             encryptor = AES.new(key, AES.MODE_CBC, IV=iv)
             new_dir = 'cryptit_{}'.format(d)
 
-            zf = zipfile.ZipFile(new_dir+'.zip', mode='w')
+            zf = zipfile.ZipFile(new_dir + '.zip', mode='w')
 
             if is_dir:
                 start_time = time.time()
+                sfilepath = arg.path+'\\'
                 for filepath in tqdm(walkdir(arg.path), desc='[#] Encrypting files'):
                     if not new_dir in filepath:
-                        encrypt_file(filepath, encryptor, iv)
-                        zf.write(filepath+'.aes')
+                        encrypt_file(filepath, sfilepath, encryptor, iv)
+                        zf.write(str.replace(filepath,sfilepath,'') + '.aes')
                         try:
-                            os.remove(filepath+'.aes')
+                            os.remove(filepath + '.aes')
                         except OSError:
                             pass
                 end_time = time.time()
@@ -157,18 +159,19 @@ def main():
                 print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
             zf.close()
 
-            try: 
+            try:
                 input = raw_input
             except NameError:
                 pass
 
-            ans = input('[*] Print archive info(y/n): ') # TODO only py2.7
+            ans = input('[*] Print archive info(y/n): ')
             if ans in ('y', 'Y'):
-                print('\n\nArchive info:\n({})\n'.format(new_dir+'.zip'))
-                print_info(new_dir+'.zip')
+                print('\n\nArchive info:\n({})\n'.format(new_dir + '.zip'))
+                print_info(new_dir + '.zip')
 
     except Exception as e:
         logger.exception(e)
+
 
 if __name__ == '__main__':
     main()
