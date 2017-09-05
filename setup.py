@@ -36,7 +36,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 NAME = 'cryptit'
 DESCRIPTION = ''
-URL = 'https://github.com/maxkrivich/cryptit/'
+URL = 'https://github.com/KKStudLab/cryptit/'
 EMAIL = 'maxkrivich@gmail.com'
 AUTHOR = 'Maxim Krivich'
 
@@ -112,15 +112,15 @@ setup(
         'Topic :: Security :: Cryptography',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: Microsoft :: Windows',
-		'Operating System :: Unix',
+	'Operating System :: Unix',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
-        # 'Programming Language :: Python :: 3',
-        # 'Programming Language :: Python :: 3.2',
-        # 'Programming Language :: Python :: 3.3',
-        # 'Programming Language :: Python :: 3.4',
-        # 'Programming Language :: Python :: 3.5',
-        # 'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
     entry_points={
         'console_scripts': ['cryptit=cryptit.cli:main'],
