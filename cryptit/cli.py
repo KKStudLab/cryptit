@@ -33,7 +33,7 @@ import zipfile
 import argparse
 
 from datetime import datetime
-from tqdm import tqdm, trange
+from tqdm import tqdm
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA3_256
 from Crypto.Random import get_random_bytes
