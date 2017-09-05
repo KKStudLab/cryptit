@@ -2,7 +2,7 @@
 
 ## Add new features
 - [ ] add threading encryption;
-- [ ] add zip support;
+- [x] add zip support;
 - [ ] add rsa + aes;
 - [ ] add logging;
 - [ ] write readme.md
