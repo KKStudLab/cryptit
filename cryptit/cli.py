@@ -83,9 +83,32 @@ def encrypt_file(filepath, sfilepath, encryptor, iv, chunksize=64 * 1024):
                 outfile.write(encryptor.encrypt(chunk))
 
 
-def decrypt_file():
-    # TODO implement this function
-    pass
+def static_vars(**kwargs):
+    def decorate(func):
+        for k in kwargs:
+            setattr(func, k, kwargs[k])
+        return func
+    return decorate
+
+@static_vars(decryptor=None)
+def decrypt_file(key, filename, chunksize=24*1024):
+    if os.path.splitext(filename)[1] != '.aes':
+        raise ValueError('File {} does not a .aes'.format(filename))
+
+    with open(filename, 'rb') as infile:
+        origsize = struct.unpack('<Q', infile.read(struct.calcsize('Q')))[0]
+        iv = infile.read(16)
+        if decrypt_file.decryptor is None:
+            decrypt_file.decryptor = AES.new(key, AES.MODE_CBC, iv)
+
+        with open(filename.rstrip('.aes'), 'wb') as outfile:
+            while True:
+                chunk = infile.read(chunksize)
+                if not len(chunk):
+                    break
+                outfile.write(decrypt_file.decryptor.decrypt(chunk))
+
+            outfile.truncate(origsize)
 
 
 def print_info(archive_name):
@@ -123,13 +146,29 @@ def main():
         while not len(passwd):
             passwd = getpass.getpass('[!] Enter your password: ')
 
+        h_obj = SHA3_256.new()
+        h_obj.update(passwd)
+        key = h_obj.digest()
+
         if arg.decrypt:
-            pass
+            if is_file and zipfile.is_zipfile(arg.path):
+                zf = zipfile.ZipFile(arg.path, mode='r')
+                new_path = os.path.join(os.getcwd(), arg.path.replace('.zip', ''))
+                zf.extractall(new_path)
+                zf.close()
+                start_time = time.time()
+                for filepath in tqdm(walkdir(new_path), desc='[#] Decrypting files'):
+                    decrypt_file(key, filepath)
+                    try:
+                        os.remove(filepath)
+                    except OSError:
+                        pass
+                end_time = time.time()
+                print('[*] Decrypting was successful!!')
+                print('[*] Dectyption time: {} seconds'.format(end_time - start_time))
+                print('[!] Output dir: {}'.format(new_path))
         else:
             # init aes-256
-            h_obj = SHA3_256.new()
-            h_obj.update(passwd)
-            key = h_obj.digest()
             iv = get_random_bytes(16)
             encryptor = AES.new(key, AES.MODE_CBC, IV=iv)
             new_dir = 'cryptit_{}'.format(d)
