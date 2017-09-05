@@ -13,7 +13,7 @@ $ pip install cryptit
 This is the preferred method to install CryptIt, as it will always install the most recent stable release.
 
 ### Source files
-In case you downloaded or cloned the source code from [GitHub](https://github.com/maxkrivich/cryptit) or your own fork, you can run the following to install cameo for development:
+In case you downloaded or cloned the source code from [GitHub](https://github.com/KKStudLab/cryptit) or your own fork, you can run the following to install cameo for development:
 
 ```sh
 $ git clone https://github.com/KKStudLab/cryptit.git
