@@ -38,8 +38,6 @@ from Crypto.Cipher import AES
 from Crypto.Hash import SHA3_256
 from Crypto.Random import get_random_bytes
 
-from __init__ import logger
-
 
 def is_valid_path(parser, arg):
     if not os.path.exists(arg):
@@ -209,7 +207,7 @@ def main():
                 print_info(new_dir + '.zip')
 
     except Exception as e:
-        logger.exception(e)
+        print(e)
 
 
 if __name__ == '__main__':
