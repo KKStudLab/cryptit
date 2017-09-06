@@ -193,9 +193,13 @@ def main():
                 print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
             else:
                 start_time = time.time()
-                encrypt_file(arg.path, '', encryptor, iv)
-                zf.write(os.path.join(new_dir, arg.path) + '.aes')
+                encrypt_file(arg.path, os.getcwd(), encryptor, iv)
+                zf.write(arg.path + '.aes')
                 end_time = time.time()
+                try:
+                    os.remove(arg.path + '.aes')
+                except OSError:
+                    pass
                 print('[*] Encrypting was successful!!')
                 print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
             zf.close()
