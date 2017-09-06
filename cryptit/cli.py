@@ -31,6 +31,7 @@ import struct
 import getpass
 import zipfile
 import argparse
+import sys
 
 from datetime import datetime
 from tqdm import tqdm
@@ -67,7 +68,7 @@ def walkdir(folder):  # TODO handle os access excetions
 def encrypt_file(filepath, sfilepath, encryptor, iv, chunksize=64 * 1024):
     filesize = os.path.getsize(filepath)
     with open(filepath, 'rb') as infile:
-        with open(filepath.replace(sfilepath,'')+ '.aes', 'wb') as outfile:
+        with open(filepath.replace(sfilepath, '') + '.aes', 'wb') as outfile:
             outfile.write(struct.pack('<Q', filesize))
             outfile.write(iv)
 
@@ -76,7 +77,7 @@ def encrypt_file(filepath, sfilepath, encryptor, iv, chunksize=64 * 1024):
                 if len(chunk) == 0:
                     break
                 elif len(chunk) % 16 != 0:
-                    chunk += ' ' * (16 - len(chunk) % 16)
+                    chunk += b' ' * (16 - len(chunk) % 16)
 
                 outfile.write(encryptor.encrypt(chunk))
 
@@ -86,10 +87,12 @@ def static_vars(**kwargs):
         for k in kwargs:
             setattr(func, k, kwargs[k])
         return func
+
     return decorate
 
+
 @static_vars(decryptor=None)
-def decrypt_file(key, filename, chunksize=24*1024):
+def decrypt_file(key, filename, chunksize=24 * 1024):
     if os.path.splitext(filename)[1] != '.aes':
         raise ValueError('File {} does not a .aes'.format(filename))
 
@@ -113,7 +116,6 @@ def print_info(archive_name):
     zf = zipfile.ZipFile(archive_name)
     for info in zf.infolist():
         print(info.filename)
-        print('[!] Comment:\t\t{}'.format(info.comment))
         print('[!] Modified:\t\t{}'.format(datetime(*info.date_time)))
         print('[!] System:\t\t{} (0 = Windows, 3 = Unix)'.format(info.create_system))
         print('[!] ZIP version:\t{}'.format(info.create_version))
@@ -143,6 +145,8 @@ def main():
 
         while not len(passwd):
             passwd = getpass.getpass('[!] Enter your password: ')
+
+        passwd = str.encode(passwd)
 
         h_obj = SHA3_256.new()
         h_obj.update(passwd)
@@ -179,7 +183,7 @@ def main():
                 for filepath in tqdm(walkdir(arg.path), desc='[#] Encrypting files'):
                     if not new_dir in filepath:
                         encrypt_file(filepath, sfilepath, encryptor, iv)
-                        zf.write(filepath.replace(sfilepath,'') + '.aes')
+                        zf.write(filepath.replace(sfilepath, '') + '.aes')
                         try:
                             os.remove(filepath + '.aes')
                         except OSError:
@@ -189,19 +193,17 @@ def main():
                 print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
             else:
                 start_time = time.time()
-                encrypt_file(arg.path, encryptor, iv)
+                encrypt_file(arg.path, '', encryptor, iv)
                 zf.write(os.path.join(new_dir, arg.path) + '.aes')
                 end_time = time.time()
                 print('[*] Encrypting was successful!!')
                 print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
             zf.close()
 
-            try:
-                input = raw_input
-            except NameError:
-                pass
+            if sys.version[0] == "3":
+                raw_input = input
 
-            ans = input('[*] Print archive info(y/n): ')
+            ans = raw_input('[*] Print archive info(y/n): ')
             if ans in ('y', 'Y'):
                 print('\n\nArchive info:\n({})\n'.format(new_dir + '.zip'))
                 print_info(new_dir + '.zip')
