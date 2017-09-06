@@ -71,14 +71,12 @@ Archive info:
 (cryptit_2017-09-05_21-36-30.zip)
 
 Screenshot from 2017-08-18 21-47-25.png.aes
-[!] Comment:		
 [!] Modified:		2017-09-05 21:36:32
 [!] System:		3 (0 = Windows, 3 = Unix)
 [!] ZIP version:	20
 [!] Compressed:		244264 bytes
 [!] Uncompressed:	244264 bytes
 Wallpapers/36571921725_64b1d675cf_k.jpg.aes
-[!] Comment:		
 [!] Modified:		2017-09-05 21:36:32
 [!] System:		3 (0 = Windows, 3 = Unix)
 [!] ZIP version:	20
@@ -108,7 +106,7 @@ If you find [bugs] or have [suggestions] about improving the module, don't hesit
 
 This project is licensed under the MIT License - see the [LICENSE] file for details
 
-Copyright (c) 2017 - [Maxim Krivich], [Ivan Kudryashov]
+Copyright (c) 2017 - [Maxim Krivich], [Ivan Kudryashov], [Danil Naumenko]
 
 [maxkrivich.github.io](https://maxkrivich.github.io/)
 
@@ -123,3 +121,4 @@ Copyright (c) 2017 - [Maxim Krivich], [Ivan Kudryashov]
 [LICENSE]: <https://github.com/KKStudLab/cryptit/blob/master/LICENSE>
 [Maxim Krivich]: <https://github.com/maxkrivich>
 [Ivan Kudryashov]: <https://github.com/entick>
+[Danil Naumenko]: <https://github.com/umqa>
