@@ -5,6 +5,18 @@
 [![Python](https://img.shields.io/badge/python-2.7+,%203.5+-blue.svg)](https://github.com/KKStudLab/cryptit)
 [![PyPI version](https://badge.fury.io/py/cryptit.svg)](https://badge.fury.io/py/cryptit)
 
+CryptIt — it's simple and powerful cross-platform encryption-tool to protect your data from third-party people (like NSA, Government, Illuminati, big bro and so one) in the easiest way as it possible. 
+
+Cryptographic security of encrypted files bases on [Advanced Encryption Standard]  (AES) algorithm in [CBC mode] with 256-bits of key length.
+
+For use cryptit you need to install python and pip on your personal computer, generate strong session password (for this step you can read useful article on [xkcd] site, it's very important) and in the end read following instructions bellow.
+
+__How does it work?__
+
+You choose the mode in what program would be launched [encryption or decryption] and pass the argument of the path to target file or directory of files. After that, you generating strong password and type that password in the program, in next step cryptit calculates hash ([SHA-3] 256) from your password and use it as key for AES-256 in CBC mode.
+
+> _Encryption has never been so easy!_
+
 ## Installation
 
 ### PyPI
@@ -24,6 +36,7 @@ $ vitualenv --python=python[version] venv
 $ source venv/bin/active
 $ pip install --editable .
 ```
+**Note**: _Don't forget about 'sudo'!_
 
 ## Basic Usage
 Available command list:
@@ -86,12 +99,12 @@ root@kali:~/Pictures$ cryptit -d cryptit_2017-09-05_21-36-30.zip
 [!] Output dir: /Pictures/cryptit_2017-09-05_21-36-30
 ```
 
-### Bugs, issues and contributing
+## Bugs, issues and contributing
 
 If you find [bugs] or have [suggestions] about improving the module, don't hesitate to contact [us].
 
 
-### License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE] file for details
 
@@ -99,6 +112,10 @@ Copyright (c) 2017 - [Maxim Krivich], [Ivan Kudryashov]
 
 [maxkrivich.github.io](https://maxkrivich.github.io/)
 
+[Advanced Encryption Standard]: <https://en.wikipedia.org/wiki/Advanced_Encryption_Standard>
+[CBC mode]: <https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_Block_Chaining_.28CBC.29>
+[xkcd]: <https://xkcd.com/936/>
+[SHA-3]: <https://en.wikipedia.org/wiki/SHA-3>
 [GitHub]: <https://github.com/KKStudLab/cryptit>
 [bugs]: <https://github.com/KKStudLab/cryptit/issues>
 [suggestions]: <https://github.com/KKStudLab/cryptit/issues>
