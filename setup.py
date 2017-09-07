@@ -32,6 +32,12 @@ import codecs
 from shutil import rmtree
 from setuptools import setup, find_packages, Command
 
+if sys.version_info[0] == 2 and sys.version_info[1] < 7:
+    sys.exit('Sorry, Python < 2.7 is not supported')
+
+if sys.version_info[0] == 3 and sys.version_info[1] < 5:
+    sys.exit('Sorry, Python < 3.5 is not supported')
+
 here = os.path.abspath(os.path.dirname(__file__))
 
 NAME = 'cryptit'
@@ -47,10 +53,11 @@ with open(os.path.join(here, NAME, '__version__.py')) as f:
 
 readme_file = os.path.join(here, 'README.md')
 try:
+    # Use python-3 to publish new version on PyPI
     from m2r import parse_from_file
     LONG_DESCRIPTION = parse_from_file(readme_file)
-except ImportError:
-    with open(readme_file) as f:
+except (ImportError, UnicodeDecodeError):
+    with codecs.open(readme_file, encoding='utf-8') as f:
         LONG_DESCRIPTION = f.read()
 
 
@@ -83,7 +90,8 @@ class PublishCommand(Command):
             pass
 
         self.status('Building Source and Wheel (universal) distribution…')
-        os.system('{0} setup.py sdist bdist_wheel --universal'.format(sys.executable))
+        os.system(
+            '{0} setup.py sdist bdist_wheel --universal'.format(sys.executable))
 
         self.status('Uploading the package to PyPi via Twine…')
         os.system('twine upload dist/*')
@@ -104,24 +112,31 @@ setup(
     install_requires=REQUIREMENTS,
     include_package_data=True,
     zip_safe=True,
-    keywords=[],
-    classifiers=[
-        'Natural Language :: English',
-        'Intended Audience :: End Users/Desktop',
-        'License :: OSI Approved :: MIT License',
-        'Topic :: Security :: Cryptography',
-        'Operating System :: MacOS :: MacOS X',
-        'Operating System :: Microsoft :: Windows',
-	'Operating System :: Unix',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-    ],
+    keywords=['encryption',
+              'encrypting-files',
+              'aes-encryption',
+              'aes-256',
+              'aes-256-cbc',
+              'sha3-256',
+              'decryption',
+              'file-protector',
+              'encryption-tool'],
+    classifiers=['Natural Language :: English',
+                 'Intended Audience :: End Users/Desktop',
+                 'License :: OSI Approved :: MIT License',
+                 'Topic :: Security :: Cryptography',
+                 'Operating System :: MacOS :: MacOS X',
+                 'Operating System :: Microsoft :: Windows',
+                 'Operating System :: Unix',
+                 'Programming Language :: Python :: 2',
+                 'Programming Language :: Python :: 2.7',
+                 'Programming Language :: Python :: 3',
+                 'Programming Language :: Python :: 3.2',
+                 'Programming Language :: Python :: 3.3',
+                 'Programming Language :: Python :: 3.4',
+                 'Programming Language :: Python :: 3.5',
+                 'Programming Language :: Python :: 3.6',
+                 ],
     entry_points={
         'console_scripts': ['cryptit=cryptit.cli:main'],
     },
