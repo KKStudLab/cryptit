@@ -80,9 +80,15 @@ def parse_args():
     parser.add_argument('-d', '--decrypt',
                         action='store_true', help='decryption mode')
     parser.add_argument('path', nargs='?', type=lambda x: is_valid_path(
-        parser, x), default=os.getcwd(), help='path to target file or directory')
+        parser, x), default=None, help='path to target file or directory')
 
-    return parser.parse_args()
+    res = parser.parse_args()
+
+    if res.path is None:
+        parser.print_help()
+        sys.exit(-1)
+
+    return res
 
 
 def walkdir(folder):  # TODO handle os access excetions
