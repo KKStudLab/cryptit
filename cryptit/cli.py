@@ -26,18 +26,44 @@ SOFTWARE.
 """
 
 import os
+import sys
 import time
 import struct
+import logging
 import getpass
 import zipfile
 import argparse
-import sys
+import logging.config
 
-from datetime import datetime
 from tqdm import tqdm
+from datetime import datetime
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA3_256
 from Crypto.Random import get_random_bytes
+
+logger = logging.getLogger(__name__)
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,  # this fixes the problem
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'default': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['default'],
+            'level': 'INFO',
+            'propagate': True
+        }
+    }
+})
 
 
 def is_valid_path(parser, arg):
@@ -54,9 +80,15 @@ def parse_args():
     parser.add_argument('-d', '--decrypt',
                         action='store_true', help='decryption mode')
     parser.add_argument('path', nargs='?', type=lambda x: is_valid_path(
-        parser, x), default=os.getcwd(), help='path to target file or directory')
+        parser, x), default=None, help='path to target file or directory')
 
-    return parser.parse_args()
+    res = parser.parse_args()
+
+    if res.path is None:
+        parser.print_help()
+        sys.exit(-1)
+
+    return res
 
 
 def walkdir(folder):  # TODO handle os access excetions
@@ -117,7 +149,8 @@ def print_info(archive_name):
     for info in zf.infolist():
         print(info.filename)
         print('[!] Modified:\t\t{}'.format(datetime(*info.date_time)))
-        print('[!] System:\t\t{} (0 = Windows, 3 = Unix)'.format(info.create_system))
+        print('[!] System:\t\t{} (0 = Windows, 3 = Unix)'.format(
+            info.create_system))
         print('[!] ZIP version:\t{}'.format(info.create_version))
         print('[!] Compressed:\t\t{} bytes'.format(info.compress_size))
         print('[!] Uncompressed:\t{} bytes'.format(info.file_size))
@@ -138,7 +171,8 @@ def main():
         d = datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")
 
         print('[*] Start time: {}'.format(d))
-        print('[*] CryptIt mode: {}(AES-256 CBC mode)'.format('Decryption' if arg.decrypt else 'Encryption'))
+        print('[*] CryptIt mode: {}(AES-256 CBC mode)'.format(
+            'Decryption' if arg.decrypt else 'Encryption'))
         print('[*] Path: {}'.format(arg.path))
 
         passwd = ''
@@ -155,7 +189,8 @@ def main():
         if arg.decrypt:
             if is_file and zipfile.is_zipfile(arg.path):
                 zf = zipfile.ZipFile(arg.path, mode='r')
-                new_path = os.path.join(os.getcwd(), arg.path.replace('.zip', ''))
+                new_path = os.path.join(
+                    os.getcwd(), arg.path.replace('.zip', ''))
                 zf.extractall(new_path)
                 zf.close()
                 start_time = time.time()
@@ -215,7 +250,7 @@ def main():
                 print_info(new_dir + '.zip')
 
     except Exception as e:
-        print(e)
+        logger.exception(e)
 
 
 if __name__ == '__main__':

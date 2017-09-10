@@ -5,7 +5,9 @@
 - [x] add zip support;
 - [ ] add rsa + aes;
 - [ ] add logging;
-- [ ] write readme.md
 - [ ] file hash sum;
 
 ## Fix bug
+- [ ] encryption and decryption problems;
+- [ ] logging in cli.py for cover all handlers and excetions;
+- [ ] path errors;
