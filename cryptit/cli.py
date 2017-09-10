@@ -65,7 +65,7 @@ def walkdir(folder):  # TODO handle os access excetions
             yield os.path.join(dirpath, filename)
 
 
-def encrypt_file(filepath, sfilepath, encryptor, iv, chunksize=64 * 1024):
+def encrypt_file(filepath, sfilepath, encryptor, iv, chunksize=AES.block_size * 1024):
     filesize = os.path.getsize(filepath)
     with open(filepath, 'rb') as infile:
         with open(filepath.replace(sfilepath, '') + '.aes', 'wb') as outfile:
@@ -76,8 +76,8 @@ def encrypt_file(filepath, sfilepath, encryptor, iv, chunksize=64 * 1024):
                 chunk = infile.read(chunksize)
                 if len(chunk) == 0:
                     break
-                elif len(chunk) % 16 != 0:
-                    chunk += b' ' * (16 - len(chunk) % 16)
+                elif len(chunk) % AES.block_size != 0:
+                    chunk += b' ' * (AES.block_size - len(chunk) % AES.block_size)
 
                 outfile.write(encryptor.encrypt(chunk))
 
@@ -92,13 +92,13 @@ def static_vars(**kwargs):
 
 
 @static_vars(decryptor=None)
-def decrypt_file(key, filename, chunksize=24 * 1024):
+def decrypt_file(key, filename, chunksize=AES.block_size * 1024):
     if os.path.splitext(filename)[1] != '.aes':
         raise ValueError('File {} does not a .aes'.format(filename))
 
     with open(filename, 'rb') as infile:
         origsize = struct.unpack('<Q', infile.read(struct.calcsize('Q')))[0]
-        iv = infile.read(16)
+        iv = infile.read(AES.block_size)
         if decrypt_file.decryptor is None:
             decrypt_file.decryptor = AES.new(key, AES.MODE_CBC, iv)
 
@@ -108,8 +108,8 @@ def decrypt_file(key, filename, chunksize=24 * 1024):
                 if not len(chunk):
                     break
                 outfile.write(decrypt_file.decryptor.decrypt(chunk))
-
             outfile.truncate(origsize)
+
 
 
 def print_info(archive_name):
@@ -171,7 +171,7 @@ def main():
                 print('[!] Output dir: {}'.format(new_path))
         else:
             # init aes-256
-            iv = get_random_bytes(16)
+            iv = get_random_bytes(AES.block_size)
             encryptor = AES.new(key, AES.MODE_CBC, IV=iv)
             new_dir = 'cryptit_{}'.format(d)
 
@@ -205,9 +205,11 @@ def main():
             zf.close()
 
             if sys.version[0] == "3":
-                raw_input = input
+                _input = input
+            else:
+                _input = raw_input
 
-            ans = raw_input('[*] Print archive info(y/n): ')
+            ans = _input('[*] Print archive info(y/n): ')
             if ans in ('y', 'Y'):
                 print('\n\nArchive info:\n({})\n'.format(new_dir + '.zip'))
                 print_info(new_dir + '.zip')
