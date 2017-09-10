@@ -5,15 +5,15 @@
 [![Python](https://img.shields.io/badge/python-2.7+,%203.5+-blue.svg)](https://github.com/KKStudLab/cryptit)
 [![PyPI version](https://badge.fury.io/py/cryptit.svg)](https://badge.fury.io/py/cryptit)
 
-CryptIt — it's simple and powerful cross-platform encryption-tool to protect your data from third-party people (like NSA, Government, Illuminati, big bro and so one) in the easiest way as it possible. 
+CryptIt — is a simple and powerful cross-platform encryption tool, which can be used to protect your data from other people (like NSA, Government, Illuminati, big bro and so on) in the easiest possible way. 
 
-Cryptographic security of encrypted files bases on [Advanced Encryption Standard]  (AES) algorithm in [CBC mode] with 256-bits of key length.
+Cryptographic security of encrypted files is based on [Advanced Encryption Standard]  (AES) algorithm in [CBC mode] with a key of 256-bits length.
 
-For use cryptit you need to install python and pip on your personal computer, generate strong session password (for this step you can read useful article on [xkcd] site, it's very important) and in the end read following instructions bellow.
+To use cryptit you need to install python and pip on your personal computer, generate strong session password (for this step you can read useful article on [xkcd] site, it's very important) and then read following instructions bellow.
 
 __How does it work?__
 
-You choose the mode in what program would be launched [encryption or decryption] and pass the argument of the path to target file or directory of files. After that, you generating strong password and type that password in the program, in next step cryptit calculates hash ([SHA-3] 256) from your password and use it as key for AES-256 in CBC mode.
+You choose the mode in which the program would be launched [encryption or decryption] and pass a path to target file or directory as an argument. After that, you generate strong password and type that password in the program. Then cryptit calculates hash ([SHA-3] 256) of your password and uses it as key for AES-256 in CBC mode.
 
 > _Encryption has never been so easy!_
 
@@ -54,7 +54,7 @@ optional arguments:
 ```
 
 ### Encryption mode
-For encrypt files on your PC open terminal and type following command use -e option and put just path to target file or directory.
+To encrypt files on your PC open terminal and type following command, use -e option and put just path to target file or directory.
 ```
 root@kali:~/Pictures$ cryptit -e .
 [*] Start time: 2017-09-05_21-36-30
