@@ -92,8 +92,11 @@ def parse_args():
 
 
 def walkdir(folder):  # TODO handle os access excetions
+    a = 1
     for dirpath, dirs, files in os.walk(folder):
         for filename in files:
+            if len(dirs):
+                a += 1
             yield os.path.join(dirpath, filename)
 
 
@@ -205,7 +208,7 @@ def main():
                 start_time = time.time()
                 sfilepath = arg.path.rstrip(os.sep) + os.sep
                 for filepath in tqdm(walkdir(arg.path), desc='[#] Encrypting files'):
-                    if not new_dir in filepath:
+                    if new_dir not in filepath:
                         encrypt_file(key,filepath, sfilepath, iv)
                         zf.write(filepath.replace(sfilepath, '') + '.aes')
                         try:
