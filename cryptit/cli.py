@@ -97,8 +97,9 @@ def walkdir(folder):  # TODO handle os access excetions
             yield os.path.join(dirpath, filename)
 
 
-def encrypt_file(filepath, sfilepath, encryptor, iv, chunksize=AES.block_size * 1024):
+def encrypt_file(filepath, sfilepath, iv, chunksize=AES.block_size * 1024):
     filesize = os.path.getsize(filepath)
+    encryptor = AES.new(key, AES.MODE_CBC, IV=iv)
     with open(filepath, 'rb') as infile:
         with open(filepath.replace(sfilepath, '') + '.aes', 'wb') as outfile:
             outfile.write(struct.pack('<Q', filesize))
@@ -113,17 +114,6 @@ def encrypt_file(filepath, sfilepath, encryptor, iv, chunksize=AES.block_size * 
 
                 outfile.write(encryptor.encrypt(chunk))
 
-
-def static_vars(**kwargs):
-    def decorate(func):
-        for k in kwargs:
-            setattr(func, k, kwargs[k])
-        return func
-
-    return decorate
-
-
-@static_vars(decryptor=None)
 def decrypt_file(key, filename, chunksize=AES.block_size * 1024):
     if os.path.splitext(filename)[1] != '.aes':
         raise ValueError('File {} does not a .aes'.format(filename))
@@ -131,15 +121,14 @@ def decrypt_file(key, filename, chunksize=AES.block_size * 1024):
     with open(filename, 'rb') as infile:
         origsize = struct.unpack('<Q', infile.read(struct.calcsize('Q')))[0]
         iv = infile.read(AES.block_size)
-        if decrypt_file.decryptor is None:
-            decrypt_file.decryptor = AES.new(key, AES.MODE_CBC, iv)
+        decryptor = AES.new(key, AES.MODE_CBC, IV=iv)
 
         with open(filename.rstrip('.aes'), 'wb') as outfile:
             while True:
                 chunk = infile.read(chunksize)
                 if not len(chunk):
                     break
-                outfile.write(decrypt_file.decryptor.decrypt(chunk))
+                outfile.write(decryptor.decrypt(chunk))
             outfile.truncate(origsize)
 
 
@@ -207,7 +196,7 @@ def main():
         else:
             # init aes-256
             iv = get_random_bytes(AES.block_size)
-            encryptor = AES.new(key, AES.MODE_CBC, IV=iv)
+            # encryptor = AES.new(key, AES.MODE_CBC, IV=iv)
             new_dir = 'cryptit_{}'.format(d)
 
             zf = zipfile.ZipFile(new_dir + '.zip', mode='w')
@@ -217,7 +206,7 @@ def main():
                 sfilepath = arg.path.rstrip(os.sep) + os.sep
                 for filepath in tqdm(walkdir(arg.path), desc='[#] Encrypting files'):
                     if not new_dir in filepath:
-                        encrypt_file(filepath, sfilepath, encryptor, iv)
+                        encrypt_file(filepath, sfilepath, iv)
                         zf.write(filepath.replace(sfilepath, '') + '.aes')
                         try:
                             os.remove(filepath + '.aes')
@@ -238,11 +227,14 @@ def main():
                 print('[*] Encrypting was successful!!')
                 print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
             zf.close()
-
-            if sys.version[0] == "3":
-                _input = input
-            else:
-                _input = raw_input
+            try:
+                if sys.version_info[0] == 3:
+                    _input = input
+                else:
+                    _input = raw_input
+            except ImportError as ie:
+                logger.error(ie)
+                sys.exit(-1)
 
             ans = _input('[*] Print archive info(y/n): ')
             if ans in ('y', 'Y'):
