@@ -191,7 +191,7 @@ def encryption(arg, is_dir, key):
         start_time = time.time()
         sfilepath = arg.path.rstrip(os.sep) + os.sep
         for filepath in tqdm(walkdir(arg.path), desc='[#] Encrypting files'):
-            if not new_dir in filepath:
+            if new_dir not in filepath:
                 encrypt_file(key, filepath, sfilepath, iv)
                 zf.write(filepath.replace(sfilepath, '') + '.aes')
                 try:
