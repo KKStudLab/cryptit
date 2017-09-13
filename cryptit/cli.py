@@ -214,9 +214,9 @@ def encryption(arg, is_dir, key):
         print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
     zf.close()
 
-    print('[*] Print archive info(y/n): ')
-    ans = sys.stdin.readline()
-    if ans in ('y\n', 'Y\n'):
+    sys.stdout.write('[*] Print archive info(y/n): ')
+    ans = sys.stdin.readline().rstrip()
+    if ans in ('y', 'Y'):
         print('\n\nArchive info:\n({})\n'.format(new_dir + '.zip'))
         print_info(new_dir + '.zip')
 
