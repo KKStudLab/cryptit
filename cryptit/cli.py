@@ -92,7 +92,10 @@ def parse_args():
 
 
 def walkdir(folder):  # TODO handle os access excetions
+    a = 1
     for dirpath, dirs, files in os.walk(folder):
+        if len(dirs):
+            a += 1
         for filename in files:
             yield os.path.join(dirpath, filename)
 
@@ -252,4 +255,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
