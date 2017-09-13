@@ -92,11 +92,8 @@ def parse_args():
 
 
 def walkdir(folder):  # TODO handle os access excetions
-    a = 1
     for dirpath, dirs, files in os.walk(folder):
         for filename in files:
-            if len(dirs):
-                a += 1
             yield os.path.join(dirpath, filename)
 
 
@@ -117,6 +114,7 @@ def encrypt_file(key, filepath, sfilepath, iv, chunksize=AES.block_size * 1024):
 
                 outfile.write(encryptor.encrypt(chunk))
 
+
 def decrypt_file(key, filename, chunksize=AES.block_size * 1024):
     if os.path.splitext(filename)[1] != '.aes':
         raise ValueError('File {} does not a .aes'.format(filename))
@@ -135,7 +133,6 @@ def decrypt_file(key, filename, chunksize=AES.block_size * 1024):
             outfile.truncate(origsize)
 
 
-
 def print_info(archive_name):
     zf = zipfile.ZipFile(archive_name)
     for info in zf.infolist():
@@ -146,6 +143,82 @@ def print_info(archive_name):
         print('[!] ZIP version:\t{}'.format(info.create_version))
         print('[!] Compressed:\t\t{} bytes'.format(info.compress_size))
         print('[!] Uncompressed:\t{} bytes'.format(info.file_size))
+
+
+def print_started_info(arg):
+    d = datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")
+    print('[*] Start time: {}'.format(d))
+    print('[*] CryptIt mode: {}(AES-256 CBC mode)'.format(
+        'Decryption' if arg.decrypt else 'Encryption'))
+    print('[*] Path: {}'.format(arg.path))
+
+
+def get_pswd():
+    passwd = ''
+    while not len(passwd):
+        passwd = getpass.getpass('[!] Enter your password: ')
+    return passwd
+
+
+def decryption(arg, is_file, key):
+    if is_file and zipfile.is_zipfile(arg.path):
+        zf = zipfile.ZipFile(arg.path, mode='r')
+        new_path = os.path.join(
+            os.getcwd(), arg.path.replace('.zip', ''))
+        zf.extractall(new_path)
+        zf.close()
+        start_time = time.time()
+        for filepath in tqdm(walkdir(new_path), desc='[#] Decrypting files'):
+            decrypt_file(key, filepath)
+            try:
+                os.remove(filepath)
+            except OSError:
+                pass
+        end_time = time.time()
+        print('[*] Decrypting was successful!!')
+        print('[*] Dectyption time: {} seconds'.format(end_time - start_time))
+        print('[!] Output dir: {}'.format(new_path))
+
+
+def encryption(arg, is_dir, key):
+    d = datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")
+    iv = get_random_bytes(AES.block_size)
+    new_dir = 'cryptit_{}'.format(d)
+
+    zf = zipfile.ZipFile(new_dir + '.zip', mode='w')
+
+    if is_dir:
+        start_time = time.time()
+        sfilepath = arg.path.rstrip(os.sep) + os.sep
+        for filepath in tqdm(walkdir(arg.path), desc='[#] Encrypting files'):
+            if not new_dir in filepath:
+                encrypt_file(key, filepath, sfilepath, iv)
+                zf.write(filepath.replace(sfilepath, '') + '.aes')
+                try:
+                    os.remove(filepath + '.aes')
+                except OSError:
+                    pass
+        end_time = time.time()
+        print('[*] Encrypting was successful!!')
+        print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
+    else:
+        start_time = time.time()
+        encrypt_file(key, arg.path, os.getcwd(), iv)
+        zf.write(arg.path + '.aes')
+        end_time = time.time()
+        try:
+            os.remove(arg.path + '.aes')
+        except OSError:
+            pass
+        print('[*] Encrypting was successful!!')
+        print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
+    zf.close()
+
+    print('[*] Print archive info(y/n): ')
+    ans = sys.stdin.readline()
+    if ans in ('y\n', 'Y\n'):
+        print('\n\nArchive info:\n({})\n'.format(new_dir + '.zip'))
+        print_info(new_dir + '.zip')
 
 
 def main():
@@ -160,89 +233,18 @@ def main():
             raise ValueError(
                 'The path {} does not file and directory!'.format(arg.path))
 
-        d = datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")
+        print_started_info(arg)
 
-        print('[*] Start time: {}'.format(d))
-        print('[*] CryptIt mode: {}(AES-256 CBC mode)'.format(
-            'Decryption' if arg.decrypt else 'Encryption'))
-        print('[*] Path: {}'.format(arg.path))
-
-        passwd = ''
-
-        while not len(passwd):
-            passwd = getpass.getpass('[!] Enter your password: ')
-
-        passwd = str.encode(passwd)
+        passwd = str.encode(get_pswd())
 
         h_obj = SHA3_256.new()
         h_obj.update(passwd)
         key = h_obj.digest()
 
         if arg.decrypt:
-            if is_file and zipfile.is_zipfile(arg.path):
-                zf = zipfile.ZipFile(arg.path, mode='r')
-                new_path = os.path.join(
-                    os.getcwd(), arg.path.replace('.zip', ''))
-                zf.extractall(new_path)
-                zf.close()
-                start_time = time.time()
-                for filepath in tqdm(walkdir(new_path), desc='[#] Decrypting files'):
-                    decrypt_file(key, filepath)
-                    try:
-                        os.remove(filepath)
-                    except OSError:
-                        pass
-                end_time = time.time()
-                print('[*] Decrypting was successful!!')
-                print('[*] Dectyption time: {} seconds'.format(end_time - start_time))
-                print('[!] Output dir: {}'.format(new_path))
+            decryption(arg, is_file, key)
         else:
-            # init aes-256
-            iv = get_random_bytes(AES.block_size)
-            # encryptor = AES.new(key, AES.MODE_CBC, IV=iv)
-            new_dir = 'cryptit_{}'.format(d)
-
-            zf = zipfile.ZipFile(new_dir + '.zip', mode='w')
-
-            if is_dir:
-                start_time = time.time()
-                sfilepath = arg.path.rstrip(os.sep) + os.sep
-                for filepath in tqdm(walkdir(arg.path), desc='[#] Encrypting files'):
-                    if new_dir not in filepath:
-                        encrypt_file(key,filepath, sfilepath, iv)
-                        zf.write(filepath.replace(sfilepath, '') + '.aes')
-                        try:
-                            os.remove(filepath + '.aes')
-                        except OSError:
-                            pass
-                end_time = time.time()
-                print('[*] Encrypting was successful!!')
-                print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
-            else:
-                start_time = time.time()
-                encrypt_file(key,arg.path, os.getcwd(), iv)
-                zf.write(arg.path + '.aes')
-                end_time = time.time()
-                try:
-                    os.remove(arg.path + '.aes')
-                except OSError:
-                    pass
-                print('[*] Encrypting was successful!!')
-                print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
-            zf.close()
-            try:
-                if sys.version_info[0] == 3:
-                    _input = input
-                else:
-                    _input = raw_input
-            except ImportError as ie:
-                logger.error(ie)
-                sys.exit(-1)
-
-            ans = _input('[*] Print archive info(y/n): ')
-            if ans in ('y', 'Y'):
-                print('\n\nArchive info:\n({})\n'.format(new_dir + '.zip'))
-                print_info(new_dir + '.zip')
+            encryption(arg, is_dir, key)
 
     except Exception as e:
         logger.exception(e)
@@ -250,3 +252,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
