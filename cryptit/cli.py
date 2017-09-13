@@ -97,7 +97,7 @@ def walkdir(folder):  # TODO handle os access excetions
             yield os.path.join(dirpath, filename)
 
 
-def encrypt_file(filepath, sfilepath, iv, chunksize=AES.block_size * 1024):
+def encrypt_file(key, filepath, sfilepath, iv, chunksize=AES.block_size * 1024):
     filesize = os.path.getsize(filepath)
     encryptor = AES.new(key, AES.MODE_CBC, IV=iv)
     with open(filepath, 'rb') as infile:
@@ -206,7 +206,7 @@ def main():
                 sfilepath = arg.path.rstrip(os.sep) + os.sep
                 for filepath in tqdm(walkdir(arg.path), desc='[#] Encrypting files'):
                     if not new_dir in filepath:
-                        encrypt_file(filepath, sfilepath, iv)
+                        encrypt_file(key,filepath, sfilepath, iv)
                         zf.write(filepath.replace(sfilepath, '') + '.aes')
                         try:
                             os.remove(filepath + '.aes')
@@ -217,7 +217,7 @@ def main():
                 print('[*] Enctyption time: {} seconds'.format(end_time - start_time))
             else:
                 start_time = time.time()
-                encrypt_file(arg.path, os.getcwd(), encryptor, iv)
+                encrypt_file(key,arg.path, os.getcwd(), iv)
                 zf.write(arg.path + '.aes')
                 end_time = time.time()
                 try:
