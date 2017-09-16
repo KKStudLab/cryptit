@@ -60,9 +60,20 @@ except (ImportError, UnicodeDecodeError):
     with codecs.open(readme_file, encoding='utf-8') as f:
         LONG_DESCRIPTION = f.read()
 
-
 with codecs.open(os.path.join(here, 'requirements.txt'), encoding='utf-8') as f:
     REQUIREMENTS = f.read().splitlines()
+
+
+if sys.platform == 'linux' or sys.platform == 'linux2':
+  # TODO
+    pass
+elif sys.platform == 'darwin':
+  # TODO
+    pass
+elif sys.platform == 'win32':
+    ind = REQUIREMENTS.index('pycryptodome==3.4.7')
+    REQUIREMENTS[ind] = REQUIREMENTS[ind].replace('pycryptodome', 'pycryptodomex') # windows lib optimization
+
 
 
 class PublishCommand(Command):
@@ -136,6 +147,8 @@ setup(
                  'Programming Language :: Python :: 3.4',
                  'Programming Language :: Python :: 3.5',
                  'Programming Language :: Python :: 3.6',
+                 'Development Status :: 5 - Production/Stable',
+                 'Environment :: Console'
                  ],
     entry_points={
         'console_scripts': ['cryptit=cryptit.cli:main'],
