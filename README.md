@@ -32,8 +32,6 @@ In case you downloaded or cloned the source code from [GitHub] or your own fork,
 ```sh
 $ git clone https://github.com/KKStudLab/cryptit.git
 $ cd cryptit
-$ vitualenv --python=python[version] venv
-$ source venv/bin/active
 $ pip install --editable .
 ```
 **Note**: _Don't forget about 'sudo'!_
@@ -68,7 +66,7 @@ root@kali:~/Pictures$ cryptit -e .
 
 
 Archive info:
-(cryptit_2017-09-05_21-36-30.zip)
+(cryptit_daaff23e9bd311e79de2240a64d6e41f.zip)
 
 Screenshot from 2017-08-18 21-47-25.png.aes
 [!] Modified:		2017-09-05 21:36:32
@@ -86,7 +84,7 @@ Wallpapers/36571921725_64b1d675cf_k.jpg.aes
 
 ### Decryption mode
 ```
-root@kali:~/Pictures$ cryptit -d cryptit_2017-09-05_21-36-30.zip 
+root@kali:~/Pictures$ cryptit -d cryptit_daaff23e9bd311e79de2240a64d6e41f.zip
 [*] Start time: 2017-09-05_21-48-36
 [*] CryptIt mode: Decryption(AES-256 CBC mode)
 [*] Path: cryptit_2017-09-05_21-36-30.zip
@@ -94,7 +92,7 @@ root@kali:~/Pictures$ cryptit -d cryptit_2017-09-05_21-36-30.zip
 [#] Decrypting files: 2it [00:00, 102.09it/s]
 [*] Decrypting was successful!!
 [*] Dectyption time: 0.0205860137939 seconds
-[!] Output dir: /Pictures/cryptit_2017-09-05_21-36-30
+[!] Output dir: /Pictures/cryptit_daaff23e9bd311e79de2240a64d6e41f
 ```
 
 ## Bugs, issues and contributing
