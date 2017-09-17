@@ -13,7 +13,7 @@ To use cryptit you need to install python and pip on your personal computer, gen
 
 __How does it work?__
 
-You choose the mode in which the program would be launched [encryption or decryption] and pass a path to target file or directory as an argument. After that, you generate strong password and type that password in the program. Then cryptit calculates hash ([SHA-3] 256) of your password and uses it as key for AES-256 in CBC mode.
+You choose the mode in which the program would be launched [encryption or decryption] and pass a path to target file or directory as an argument. After that, you generate strong password and type that password in the program. Then cryptit calculates hash ([SHA3-256]) of your password and uses it as key for AES-256 in CBC mode.
 
 > _Encryption has never been so easy!_
 
@@ -111,7 +111,7 @@ Copyright (c) 2017 - [Maxim Krivich], [Ivan Kudryashov], [Danil Naumenko]
 [Advanced Encryption Standard]: <https://en.wikipedia.org/wiki/Advanced_Encryption_Standard>
 [CBC mode]: <https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_Block_Chaining_.28CBC.29>
 [xkcd]: <https://xkcd.com/936/>
-[SHA-3]: <https://en.wikipedia.org/wiki/SHA-3>
+[SHA3-256]: <https://en.wikipedia.org/wiki/SHA-3>
 [GitHub]: <https://github.com/KKStudLab/cryptit>
 [bugs]: <https://github.com/KKStudLab/cryptit/issues>
 [suggestions]: <https://github.com/KKStudLab/cryptit/issues>
