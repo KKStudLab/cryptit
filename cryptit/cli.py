@@ -27,6 +27,7 @@ SOFTWARE.
 
 import os
 import sys
+import uuid
 import time
 import struct
 import logging
@@ -38,7 +39,7 @@ import logging.config
 from tqdm import tqdm
 from datetime import datetime
 from Crypto.Cipher import AES
-from Crypto.Hash import SHA3_256
+from Crypto.Hash import SHA3_256, HMAC, SHA256
 from Crypto.Random import get_random_bytes
 
 logger = logging.getLogger(__name__)
@@ -103,8 +104,11 @@ def walkdir(folder):  # TODO handle os access excetions
 def encrypt_file(key, filepath, sfilepath, iv, chunksize=AES.block_size * 1024):
     filesize = os.path.getsize(filepath)
     encryptor = AES.new(key, AES.MODE_CBC, IV=iv)
+    h = HMAC.new(key, digestmod=SHA256)
+
     with open(filepath, 'rb') as infile:
         with open(filepath.replace(sfilepath, '') + '.aes', 'wb') as outfile:
+            outfile.seek(32, 0)
             outfile.write(struct.pack('<Q', filesize))
             outfile.write(iv)
 
@@ -114,15 +118,21 @@ def encrypt_file(key, filepath, sfilepath, iv, chunksize=AES.block_size * 1024):
                     break
                 elif len(chunk) % AES.block_size != 0:
                     chunk += b' ' * (AES.block_size - len(chunk) % AES.block_size)
-
-                outfile.write(encryptor.encrypt(chunk))
+                enc = encryptor.encrypt(chunk)
+                h.update(enc)
+                outfile.write(enc)
+            outfile.seek(0, 0)
+            outfile.write(h.digest())
 
 
 def decrypt_file(key, filename, chunksize=AES.block_size * 1024):
     if os.path.splitext(filename)[1] != '.aes':
         raise ValueError('File {} does not a .aes'.format(filename))
 
+    h = HMAC.new(key, digestmod=SHA256)
+
     with open(filename, 'rb') as infile:
+        mac = infile.read(32)
         origsize = struct.unpack('<Q', infile.read(struct.calcsize('Q')))[0]
         iv = infile.read(AES.block_size)
         decryptor = AES.new(key, AES.MODE_CBC, IV=iv)
@@ -132,8 +142,16 @@ def decrypt_file(key, filename, chunksize=AES.block_size * 1024):
                 chunk = infile.read(chunksize)
                 if not len(chunk):
                     break
+                h.update(chunk)
                 outfile.write(decryptor.decrypt(chunk))
             outfile.truncate(origsize)
+
+        try:
+            h.verify(mac)
+        except ValueError:
+            logger.info("The file or the key is wrong")
+            os.remove(filename)
+            sys.exit(-1)
 
 
 def print_info(archive_name):
@@ -184,7 +202,8 @@ def decryption(arg, is_file, key):
 
 
 def encryption(arg, is_dir, key):
-    d = datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")
+    u = uuid.uuid1()
+    d = str(u.hex)
     iv = get_random_bytes(AES.block_size)
     new_dir = 'cryptit_{}'.format(d)
 
