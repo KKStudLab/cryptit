@@ -1,2 +1,2 @@
 pycryptodome==3.4.7
-tqdm==4.15.0
+tqdm==4.17.0
