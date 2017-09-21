@@ -217,7 +217,9 @@ def encryption(arg, is_dir, key):
                 encrypt_file(key, filepath, sfilepath, iv)
                 zf.write(filepath.replace(sfilepath, '') + '.aes')
                 try:
-                    os.remove(filepath + '.aes')
+                    for file in walkdir(os.getcwd()):
+                        if str(os.path.abspath(file)).split('.')[-1] == 'aes':
+                            os.remove(file)
                 except OSError:
                     pass
         end_time = time.time()
@@ -237,6 +239,7 @@ def encryption(arg, is_dir, key):
     zf.close()
 
     sys.stdout.write('[*] Print archive info(y/n): ')
+    sys.stdout.flush()
     ans = sys.stdin.readline().rstrip()
     if ans in ('y', 'Y'):
         print('\n\nArchive info:\n({})\n'.format(new_dir + '.zip'))
