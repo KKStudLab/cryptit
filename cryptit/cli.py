@@ -30,7 +30,6 @@ import sys
 import uuid
 import time
 import struct
-import logging
 import getpass
 import zipfile
 import argparse
